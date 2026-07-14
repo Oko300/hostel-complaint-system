@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Hostel Complaint System</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="auth-page">
+    <div class="auth-card">
+        <div class="logo">
+            <h1><i class="fas fa-home"></i> HostelCare</h1>
+        </div>
+        <h2>Create Account</h2>
+        <p class="text-muted">Join us to manage your hostel complaints efficiently</p>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="registerFullName" class="form-label">Full Name</label>
+                <input type="text" id="registerFullName" class="form-control" placeholder="Enter your full name" required>
+            </div>
+            <div class="form-group">
+                <label for="registerEmail" class="form-label">Email</label>
+                <input type="email" id="registerEmail" class="form-control" placeholder="Enter your email" required>
+                <p id="emailError" class="form-error"></p>
+            </div>
+            <div class="form-group">
+                <label for="registerMatricNumber" class="form-label">Matric Number</label>
+                <input type="text" id="registerMatricNumber" class="form-control" placeholder="Enter your matric number" required>
+                <p id="matricNumberError" class="form-error"></p>
+            </div>
+            <div class="form-group">
+                <label for="registerRoomNumber" class="form-label">Room Number</label>
+                <input type="text" id="registerRoomNumber" class="form-control" placeholder="Enter your room number" required>
+            </div>
+            <div class="form-group">
+                <label for="registerPassword" class="form-label">Password</label>
+                <input type="password" id="registerPassword" class="form-control" placeholder="Create a password" required>
+            </div>
+            <div class="form-group">
+                <label for="registerConfirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" id="registerConfirmPassword" class="form-control" placeholder="Confirm your password" required>
+                <p id="passwordConfirmError" class="form-error"></p>
+            </div>
+            <p id="registerError" class="form-error"></p>
+            <button type="submit" id="registerButton" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Register</button>
+        </form>
+        <p style="margin-top: 1.5rem;">Already have an account? <a href="/index.html">Login here</a></p>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', handleRegister);
+
+        // Redirect if already logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user && user.role === 'admin') {
+                    window.location.href = '/admin/dashboard.html';
+                } else if (user && user.role === 'student') {
+                    window.location.href = '/student/dashboard.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

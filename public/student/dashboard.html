@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Hostel Complaint System</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-home"></i> HostelCare</h2>
+                <p id="studentName" style="color: #fff; font-weight: 600; margin-top: 1rem;"></p>
+                <p id="studentRoom" style="color: #ccc; font-size: 0.9rem;"></p>
+                <button class="hamburger-menu" id="hamburgerMenu">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="sidebar-item"><a href="/student/dashboard.html" class="sidebar-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li class="sidebar-item"><a href="/student/submit.html" class="sidebar-link"><i class="fas fa-plus-circle"></i> Submit Complaint</a></li>
+                    <li class="sidebar-item"><a href="/student/track.html" class="sidebar-link"><i class="fas fa-list-alt"></i> Track Complaints</a></li>
+                    <li class="sidebar-item"><a href="#" id="logoutButton" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="container">
+                <h1>Dashboard</h1>
+                <p class="text-muted">Welcome to your student dashboard. Here's a quick overview of your complaints.</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+                    <div class="card stat-card primary">
+                        <h3>Total Complaints</h3>
+                        <p id="totalComplaints">0</p>
+                    </div>
+                    <div class="card stat-card warning">
+                        <h3>Pending</h3>
+                        <p id="pendingComplaints">0</p>
+                    </div>
+                    <div class="card stat-card info">
+                        <h3>In Progress</h3>
+                        <p id="inProgressComplaints">0</p>
+                    </div>
+                    <div class="card stat-card success">
+                        <h3>Resolved</h3>
+                        <p id="resolvedComplaints">0</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 2rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2>Recent Complaints</h2>
+                        <a href="/student/submit.html" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Submit New Complaint</a>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Submitted Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentComplaintsBody">
+                                <!-- Recent complaints will be loaded here by JavaScript -->
+                                <tr><td colspan="5" class="empty-state">Loading recent complaints...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/student.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            requireAuth('student'); // Ensure student is authenticated
+
+            const sidebar = document.querySelector('.sidebar');
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+
+            if (hamburgerMenu) {
+                hamburgerMenu.addEventListener('click', () => {
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            document.getElementById('logoutButton').addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
+            });
+        });
+    </script>
+</body>
+</html>

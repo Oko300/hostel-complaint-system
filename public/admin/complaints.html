@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Complaints - Admin Panel</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+                <p id="adminName" style="color: #fff; font-weight: 600; margin-top: 1rem;"></p>
+                <button class="hamburger-menu" id="hamburgerMenu">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="sidebar-item"><a href="/admin/dashboard.html" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li class="sidebar-item"><a href="/admin/complaints.html" class="sidebar-link active"><i class="fas fa-list-alt"></i> All Complaints</a></li>
+                    <li class="sidebar-item"><a href="/admin/reports.html" class="sidebar-link"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                    <li class="sidebar-item"><a href="#" id="logoutButton" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="container">
+                <h1>All Complaints</h1>
+                <p class="text-muted">Manage all submitted complaints from students.</p>
+
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="filter-bar" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="statusFilter" class="form-label" style="display: block; margin-bottom: 0.25rem;">Status</label>
+                            <select id="statusFilter" class="form-control">
+                                <option value="All">All</option>
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Resolved">Resolved</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="categoryFilter" class="form-label" style="display: block; margin-bottom: 0.25rem;">Category</label>
+                            <select id="categoryFilter" class="form-control">
+                                <option value="All">All</option>
+                                <option value="Electricity">Electricity</option>
+                                <option value="Plumbing">Plumbing</option>
+                                <option value="Furniture">Furniture</option>
+                                <option value="Noise">Noise</option>
+                                <option value="Cleanliness">Cleanliness</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; flex-grow: 1;">
+                            <label for="complaintSearch" class="form-label" style="display: block; margin-bottom: 0.25rem;">Search (Name/Matric)</label>
+                            <input type="text" id="complaintSearch" class="form-control" placeholder="Student name or matric number">
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Student Name</th>
+                                    <th>Room</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="complaintsTableBody">
+                                <!-- Complaints will be loaded here by JavaScript -->
+                                <tr><td colspan="9" class="empty-state">Loading complaints...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Complaint Management Modal -->
+    <div id="complaintManageModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modalComplaintTitle">Manage Complaint</h3>
+                <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Complaint ID:</strong> <span id="modalComplaintId"></span></p>
+                <p><strong>Student Name:</strong> <span id="modalStudentName"></span></p>
+                <p><strong>Matric Number:</strong> <span id="modalStudentMatric"></span></p>
+                <p><strong>Room Number:</strong> <span id="modalStudentRoom"></span></p>
+                <hr style="margin: 1rem 0;">
+                <p><strong>Title:</strong> <span id="modalComplaintTitle"></span></p>
+                <p><strong>Category:</strong> <span id="modalComplaintCategory"></span></p>
+                <p><strong>Priority:</strong> <span id="modalComplaintPriority"></span></p>
+                <p><strong>Description:</strong></p>
+                <p id="modalComplaintDescription"></p>
+                <p><strong>Submitted On:</strong> <span id="modalCreatedAt"></span></p>
+                <p><strong>Last Updated:</strong> <span id="modalUpdatedAt"></span></p>
+                <hr style="margin: 1rem 0;">
+                <div class="form-group">
+                    <label for="modalStatusSelect" class="form-label">Update Status</label>
+                    <select id="modalStatusSelect" class="form-control">
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="modalAdminResponse" class="form-label">Admin Response</label>
+                    <textarea id="modalAdminResponse" class="form-control" rows="4" placeholder="Enter your response or notes here..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="updateComplaintButton">Update Complaint</button>
+                <button class="btn btn-outline" id="modalCloseBtnFooter">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            requireAuth('admin'); // Ensure admin is authenticated
+
+            const sidebar = document.querySelector('.sidebar');
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+
+            if (hamburgerMenu) {
+                hamburgerMenu.addEventListener('click', () => {
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            document.getElementById('logoutButton').addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
+            });
+
+            // Re-attach close button listener for the footer button
+            document.getElementById('modalCloseBtnFooter').addEventListener('click', () => {
+                document.getElementById('complaintManageModal').classList.remove('show');
+            });
+        });
+    </script>
+</body>
+</html>

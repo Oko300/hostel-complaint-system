@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Complaint - Hostel Complaint System</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-home"></i> HostelCare</h2>
+                <p id="studentName" style="color: #fff; font-weight: 600; margin-top: 1rem;"></p>
+                <p id="studentRoom" style="color: #ccc; font-size: 0.9rem;"></p>
+                <button class="hamburger-menu" id="hamburgerMenu">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="sidebar-item"><a href="/student/dashboard.html" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li class="sidebar-item"><a href="/student/submit.html" class="sidebar-link active"><i class="fas fa-plus-circle"></i> Submit Complaint</a></li>
+                    <li class="sidebar-item"><a href="/student/track.html" class="sidebar-link"><i class="fas fa-list-alt"></i> Track Complaints</a></li>
+                    <li class="sidebar-item"><a href="#" id="logoutButton" class="sidebar-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="container">
+                <h1>Submit a Complaint</h1>
+                <p class="text-muted">Please fill out the form below to submit your complaint.</p>
+
+                <div class="card" style="margin-top: 2rem;">
+                    <form id="submitComplaintForm">
+                        <div class="form-group">
+                            <label for="complaintTitle" class="form-label">Complaint Title</label>
+                            <input type="text" id="complaintTitle" class="form-control" placeholder="e.g., Leaky Faucet in Room 101" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="complaintCategory" class="form-label">Category</label>
+                            <select id="complaintCategory" class="form-control" required>
+                                <option value="">Select a category</option>
+                                <option value="Electricity">Electricity</option>
+                                <option value="Plumbing">Plumbing</option>
+                                <option value="Furniture">Furniture</option>
+                                <option value="Noise">Noise</option>
+                                <option value="Cleanliness">Cleanliness</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Priority</label>
+                            <div style="display: flex; gap: 1rem;">
+                                <label><input type="radio" name="complaintPriority" value="Low" checked> Low</label>
+                                <label><input type="radio" name="complaintPriority" value="Medium"> Medium</label>
+                                <label><input type="radio" name="complaintPriority" value="High"> High</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="complaintDescription" class="form-label">Description</label>
+                            <textarea id="complaintDescription" class="form-control" rows="5" placeholder="Provide a detailed description of your complaint (minimum 20 characters)" required minlength="20"></textarea>
+                        </div>
+
+                        <p id="submitError" class="form-error"></p>
+                        <div id="submitSuccess"></div>
+
+                        <button type="submit" id="submitButton" class="btn btn-primary" style="margin-top: 1.5rem;"><i class="fas fa-paper-plane"></i> Submit Complaint</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/student.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            requireAuth('student'); // Ensure student is authenticated
+
+            const sidebar = document.querySelector('.sidebar');
+            const hamburgerMenu = document.getElementById('hamburgerMenu');
+
+            if (hamburgerMenu) {
+                hamburgerMenu.addEventListener('click', () => {
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            document.getElementById('logoutButton').addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
+            });
+        });
+    </script>
+</body>
+</html>

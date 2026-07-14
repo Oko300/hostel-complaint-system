@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
+const { pool } = require('../db');
 const authenticateToken = require('../middleware/auth');
 
 // POST /api/complaints/submit
-router.post('/submit', authenticateToken, (req, res) => {
+router.post('/submit', authenticateToken, async (req, res) => {
   const { title, category, description, priority } = req.body;
   const user_id = req.user.id;
 
@@ -21,12 +21,12 @@ router.post('/submit', authenticateToken, (req, res) => {
   const complaintPriority = priority && validPriorities.includes(priority) ? priority : 'Medium';
 
   try {
-    const stmt = db.prepare(
-      'INSERT INTO complaints (user_id, title, category, description, priority) VALUES (?, ?, ?, ?, ?)'
+    const result = await pool.query(
+      'INSERT INTO complaints (user_id, title, category, description, priority) VALUES ($1, $2, $3, $4, $5) RETURNING id, title, category, description, priority, status, created_at',
+      [user_id, title, category, description, complaintPriority]
     );
-    const info = stmt.run(user_id, title, category, description, complaintPriority);
 
-    const newComplaint = db.prepare('SELECT id, title, category, description, priority, status, created_at FROM complaints WHERE id = ?').get(info.lastInsertRowid);
+    const newComplaint = result.rows[0];
 
     res.status(201).json({
       success: true,
@@ -40,13 +40,28 @@ router.post('/submit', authenticateToken, (req, res) => {
 });
 
 // GET /api/complaints/my
-router.get('/my', authenticateToken, (req, res) => {
+router.get('/my', authenticateToken, async (req, res) => {
   const user_id = req.user.id;
+  const { status, category } = req.query;
 
   try {
-    const complaints = db.prepare(
-      'SELECT id, title, category, status, priority, created_at, admin_response FROM complaints WHERE user_id = ? ORDER BY created_at DESC'
-    ).all(user_id);
+    let query = 'SELECT id, title, category, status, priority, created_at, admin_response FROM complaints WHERE user_id = $1';
+    const params = [user_id];
+    let paramIndex = 2;
+
+    if (status) {
+      query += ` AND status = $${paramIndex++}`;
+      params.push(status);
+    }
+    if (category) {
+      query += ` AND category = $${paramIndex++}`;
+      params.push(category);
+    }
+
+    query += ' ORDER BY created_at DESC';
+
+    const result = await pool.query(query, params);
+    const complaints = result.rows;
 
     res.status(200).json({
       success: true,
@@ -60,13 +75,14 @@ router.get('/my', authenticateToken, (req, res) => {
 });
 
 // GET /api/complaints/:id
-router.get('/:id', authenticateToken, (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
   const complaintId = req.params.id;
   const user_id = req.user.id;
   const user_role = req.user.role;
 
   try {
-    const complaint = db.prepare('SELECT * FROM complaints WHERE id = ?').get(complaintId);
+    const result = await pool.query('SELECT * FROM complaints WHERE id = $1', [complaintId]);
+    const complaint = result.rows[0];
 
     if (!complaint) {
       return res.status(404).json({ success: false, message: 'Complaint not found.' });

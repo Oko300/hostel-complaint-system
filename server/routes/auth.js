@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const db = require('../db');
+const { pool } = require('../db');
 require('dotenv').config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey'; // Fallback for development
@@ -13,7 +13,7 @@ const generateToken = (user) => {
 };
 
 // POST /api/auth/register
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   const { full_name, email, password, matric_number, room_number } = req.body;
 
   // Basic input validation
@@ -22,15 +22,14 @@ router.post('/register', (req, res) => {
   }
 
   try {
-    const hashedPassword = bcrypt.hashSync(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const stmt = db.prepare(
-      'INSERT INTO users (full_name, email, password, matric_number, room_number) VALUES (?, ?, ?, ?, ?)'
+    const result = await pool.query(
+      'INSERT INTO users (full_name, email, password, matric_number, room_number) VALUES ($1, $2, $3, $4, $5) RETURNING id, full_name, email, matric_number, room_number, role',
+      [full_name, email, hashedPassword, matric_number, room_number]
     );
-    const info = stmt.run(full_name, email, hashedPassword, matric_number, room_number);
 
-    const newUser = db.prepare('SELECT id, full_name, email, matric_number, room_number, role FROM users WHERE id = ?').get(info.lastInsertRowid);
-
+    const newUser = result.rows[0];
     const token = generateToken(newUser);
 
     res.status(201).json({
@@ -39,7 +38,7 @@ router.post('/register', (req, res) => {
       data: { user: newUser, token },
     });
   } catch (error) {
-    if (error.message.includes('UNIQUE constraint failed')) {
+    if (error.code === '23505') { // Unique violation error code for PostgreSQL
       return res.status(409).json({ success: false, message: 'Email or Matric Number already registered.' });
     }
     console.error('Registration error:', error);
@@ -48,7 +47,7 @@ router.post('/register', (req, res) => {
 });
 
 // POST /api/auth/login
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -56,13 +55,14 @@ router.post('/login', (req, res) => {
   }
 
   try {
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
 
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials.' });
     }
 
-    const isPasswordValid = bcrypt.compareSync(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return res.status(401).json({ success: false, message: 'Invalid credentials.' });

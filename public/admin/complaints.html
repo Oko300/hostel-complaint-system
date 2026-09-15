@@ -6,6 +6,52 @@
     <title>All Complaints - Admin Panel</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* FIX: modal must never be taller than the screen.
+           Header and footer stay visible; only the body scrolls. */
+        #complaintManageModal .modal-box {
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;          /* never overflow the screen */
+            width: 90%;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 8px;
+            overflow: hidden;          /* clip children to rounded corners */
+        }
+
+        #complaintManageModal .modal-header {
+            flex-shrink: 0;            /* header never collapses */
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #complaintManageModal .modal-body {
+            flex: 1 1 auto;            /* body takes all available space */
+            overflow-y: auto;          /* body scrolls when content is tall */
+            padding: 1.25rem;
+        }
+
+        #complaintManageModal .modal-footer {
+            flex-shrink: 0;            /* footer never collapses */
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            flex-wrap: wrap;           /* wrap buttons on small screens */
+            gap: 0.5rem;
+            background: #fff;          /* solid background so it doesn't show content beneath */
+        }
+
+        /* Make buttons full width on very small screens */
+        @media (max-width: 480px) {
+            #complaintManageModal .modal-footer .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="page-wrapper">
@@ -89,7 +135,6 @@
     <div id="complaintManageModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
-                <!-- FIX: was id="modalComplaintTitle" — renamed to id="modalHeader" to remove duplicate ID -->
                 <h3 id="modalHeader">Manage Complaint</h3>
                 <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
             </div>
@@ -99,7 +144,6 @@
                 <p><strong>Matric Number:</strong> <span id="modalStudentMatric"></span></p>
                 <p><strong>Room Number:</strong> <span id="modalStudentRoom"></span></p>
                 <hr style="margin: 1rem 0;">
-                <!-- FIX: this span now correctly holds the only id="modalComplaintTitle" -->
                 <p><strong>Title:</strong> <span id="modalComplaintTitle"></span></p>
                 <p><strong>Category:</strong> <span id="modalComplaintCategory"></span></p>
                 <p><strong>Priority:</strong> <span id="modalComplaintPriority"></span></p>
@@ -122,11 +166,11 @@
                     <textarea id="modalAdminResponse" class="form-control" rows="4" placeholder="Enter your response or notes here..."></textarea>
                 </div>
             </div>
+            <!-- Footer is always visible — it sits outside the scrolling body -->
             <div class="modal-footer">
                 <button class="btn btn-primary" id="updateComplaintButton">
                     <i class="fas fa-save"></i> Update Status
                 </button>
-                <!-- NEW: Send Reply button so admin can notify the student -->
                 <button class="btn btn-success" id="sendReplyButton">
                     <i class="fas fa-paper-plane"></i> Send Reply to Student
                 </button>
@@ -139,8 +183,6 @@
     <script src="/js/admin.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // FIX: removed redundant requireAuth('admin') call — admin.js already handles this
-
             const sidebar = document.querySelector('.sidebar');
             const hamburgerMenu = document.getElementById('hamburgerMenu');
 

@@ -13,7 +13,7 @@
             <div class="sidebar-header">
                 <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
                 <p id="adminName" style="color: #fff; font-weight: 600; margin-top: 1rem;"></p>
-                <button class="hamburger-menu" id="hamburgerMenu">☰</button>
+                <button class="hamburger-menu" id="hamburgerMenu">&#9776;</button>
             </div>
             <nav class="sidebar-nav">
                 <ul>
@@ -41,11 +41,12 @@
                             <label for="toDate" class="form-label" style="display: block; margin-bottom: 0.25rem;">To Date</label>
                             <input type="date" id="toDate" class="form-control">
                         </div>
-                        <button id="generateReportButton" class="btn btn-primary" style="height: 38px;"><i class="fas fa-file-alt"></i> Generate Report</button>
+                        <button id="generateReportButton" class="btn btn-primary" style="height: 38px;">
+                            <i class="fas fa-file-alt"></i> Generate Report
+                        </button>
                     </div>
 
                     <div id="reportSummary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
-                        <!-- Report summary stats will be loaded here by JavaScript -->
                         <div class="card stat-card primary"><h3>Total</h3><p>0</p></div>
                         <div class="card stat-card secondary"><h3>Pending</h3><p>0</p></div>
                         <div class="card stat-card warning"><h3>In Progress</h3><p>0</p></div>
@@ -55,7 +56,9 @@
 
                     <h2 style="margin-top: 2rem;">Complaints in Period</h2>
                     <div style="text-align: right; margin-bottom: 1rem;">
-                        <button id="exportCsvButton" class="btn btn-outline"><i class="fas fa-file-csv"></i> Export as CSV</button>
+                        <button id="exportCsvButton" class="btn btn-outline">
+                            <i class="fas fa-file-csv"></i> Export as CSV
+                        </button>
                     </div>
                     <div class="table-wrapper">
                         <table class="table">
@@ -74,7 +77,6 @@
                                 </tr>
                             </thead>
                             <tbody id="reportTableBody">
-                                <!-- Report complaints will be loaded here by JavaScript -->
                                 <tr><td colspan="10" class="empty-state">Generate a report to see data.</td></tr>
                             </tbody>
                         </table>
@@ -88,7 +90,7 @@
     <script src="/js/admin.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            requireAuth('admin'); // Ensure admin is authenticated
+            // FIX: removed redundant requireAuth('admin') call — admin.js already handles this
 
             const sidebar = document.querySelector('.sidebar');
             const hamburgerMenu = document.getElementById('hamburgerMenu');

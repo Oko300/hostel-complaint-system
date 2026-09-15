@@ -14,7 +14,7 @@
             font-size: 0.95rem;
         }
         .category-item span:first-child {
-            flex: 0 0 150px; /* Fixed width for category name and count */
+            flex: 0 0 150px;
             margin-right: 1rem;
         }
         .category-bar-wrapper {
@@ -27,7 +27,7 @@
         }
         .category-bar {
             height: 100%;
-            background-color: var(--primary); /* Or a gradient/different color */
+            background-color: var(--primary);
             border-radius: 4px;
             transition: width 0.5s ease-out;
         }
@@ -39,7 +39,7 @@
             <div class="sidebar-header">
                 <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
                 <p id="adminName" style="color: #fff; font-weight: 600; margin-top: 1rem;"></p>
-                <button class="hamburger-menu" id="hamburgerMenu">☰</button>
+                <button class="hamburger-menu" id="hamburgerMenu">&#9776;</button>
             </div>
             <nav class="sidebar-nav">
                 <ul>
@@ -94,7 +94,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="recentComplaintsBody">
-                                    <!-- Recent complaints will be loaded here by JavaScript -->
                                     <tr><td colspan="5" class="empty-state">Loading recent complaints...</td></tr>
                                 </tbody>
                             </table>
@@ -104,7 +103,6 @@
                     <div class="card">
                         <h2>Complaints by Category</h2>
                         <div id="complaintsByCategoryList" style="margin-top: 1rem;">
-                            <!-- Category bars will be loaded here by JavaScript -->
                             <div class="empty-state">Loading categories...</div>
                         </div>
                     </div>
@@ -117,7 +115,7 @@
     <script src="/js/admin.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            requireAuth('admin'); // Ensure admin is authenticated
+            // FIX: removed redundant requireAuth('admin') call — admin.js already handles this
 
             const sidebar = document.querySelector('.sidebar');
             const hamburgerMenu = document.getElementById('hamburgerMenu');

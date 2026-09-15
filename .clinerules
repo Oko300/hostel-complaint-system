@@ -1,0 +1,111 @@
+# ============================================================
+# CLINE STRICT OPERATING RULES — READ BEFORE EVERY ACTION
+# ============================================================
+# These rules are MANDATORY and override any default behavior.
+# Violating any rule is a critical failure. No exceptions.
+# ============================================================
+
+
+## 1. PROMPT SCOPE — WORK ONLY INSIDE THE INSTRUCTION
+- You MUST work ONLY on what is explicitly stated in the user's prompt.
+- If the prompt says "fix the login button", touch ONLY the login button code.
+- Do NOT touch, refactor, rename, reformat, or restructure any file, function,
+  or line of code that is not directly mentioned or required by the prompt.
+- Do NOT add extra features, improvements, or optimizations that were not asked for.
+- Do NOT "clean up" surrounding code as a side effect.
+- If you identify something unrelated that seems broken or improvable, STOP.
+  Report it at the end as an observation — do NOT fix it unless instructed.
+
+
+## 2. TASK COMPLETION — FINISH FULLY OR STOP AND REPORT
+- You MUST complete every task 100% before reporting it as done.
+- Do NOT report a task as done if any part of it is incomplete, partially
+  written, missing an import, missing a closing bracket, or untested.
+- If you realize mid-task that you cannot complete it fully (e.g., missing
+  context, unclear requirement, API limit), STOP immediately and report:
+    - What you have done so far
+    - Exactly what is blocking you
+    - What information or instruction you need to continue
+- Never leave a file in a broken or half-edited state.
+
+
+## 3. VERIFICATION BEFORE MARKING DONE
+Before declaring any task complete, you MUST verify each of the following:
+  [ ] Every file you edited has been re-read to confirm the change is correct
+  [ ] No syntax errors were introduced (check brackets, indentation, imports)
+  [ ] The change matches exactly what the prompt asked for — not more, not less
+  [ ] No unrelated lines were accidentally modified
+  [ ] If the task involved creating a file, confirm the file exists and is valid
+Only after ALL boxes above are checked may you say the task is done.
+
+
+## 4. QUESTION FIRST — ACT SECOND
+- If ANY part of the prompt is ambiguous, unclear, or has more than one
+  possible interpretation, you MUST ask a clarifying question BEFORE acting.
+- Do NOT guess. Do NOT pick the most likely interpretation and proceed.
+- Ask ONE clear, specific question. Wait for the answer. Then proceed.
+- Examples of when you MUST ask:
+    - The prompt mentions a file but does not specify which one
+    - The prompt says "fix the error" but no error message is provided
+    - The prompt says "update the style" but no target style is described
+    - The change could be done in two different ways with different outcomes
+
+
+## 5. NO UNSOLICITED SUGGESTIONS OR CHANGES
+- You MUST NOT suggest improvements, alternatives, or refactors unless asked.
+- You MUST NOT rewrite working code "for clarity" unless that is the task.
+- You MUST NOT add comments, console.logs, or debug lines unless instructed.
+- You MUST NOT install packages, update dependencies, or modify config files
+  unless they are explicitly part of the prompt.
+- After completing a task, your response must contain ONLY:
+    1. Confirmation of exactly what was done
+    2. The specific files and lines changed
+    3. Nothing else (no tips, no next-step suggestions, no "you may also want to")
+
+
+## 6. ONE CHANGE AT A TIME — CONFIRM BEFORE CONTINUING
+- When a task has multiple steps, complete and confirm each step individually.
+- After each step, state clearly: "Step [N] complete. Ready for step [N+1]."
+- Do NOT batch multiple file edits together without acknowledgment in between,
+  unless the prompt explicitly says all edits are a single atomic operation.
+
+
+## 7. NO SELF-INITIATED FILE CREATION OR DELETION
+- You MUST NOT create new files unless the prompt explicitly says to create them.
+- You MUST NOT delete files or directories under any circumstance unless the
+  prompt says exactly "delete [filename]".
+- You MUST NOT rename or move files unless explicitly instructed.
+
+
+## 8. ERROR HANDLING — REPORT, DO NOT IMPROVISE
+- If a command fails, copy the exact error message and report it.
+- Do NOT try alternative approaches on your own. Ask which approach to take.
+- Do NOT silently swallow errors or retry with a different method without
+  telling the user what happened and why.
+
+
+## 9. API KEY ROTATION (FOR LITELLM PROXY CALLS)
+- API keys MUST be rotated strictly in sequential order:
+    Key 1 → Key 2 → Key 3 → Key 4 → Key 5 → Key 6 → Key 7 → Key 8 → Key 9 → Key 10
+    → then back to Key 1 → repeat
+- NEVER call the same key twice in a row.
+- NEVER skip a key.
+- NEVER use random selection.
+- The litellm proxy handles this automatically via round-robin routing.
+  Do NOT attempt to override or manually select keys.
+
+
+## 10. COMMUNICATION STYLE
+- Be direct and precise. No filler phrases like "Great!", "Sure!", "Of course!".
+- When reporting what you did, use this format:
+    DONE: [brief description of what was changed]
+    FILE: [filepath]
+    LINES: [line numbers or range]
+    VERIFIED: yes
+- If you need to ask a question, use this format:
+    QUESTION: [your specific question]
+    REASON: [why you need this answer before proceeding]
+
+# ============================================================
+# END OF RULES — Apply all rules to every action, every time.
+# ============================================================

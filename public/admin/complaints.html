@@ -13,7 +13,7 @@
             <div class="sidebar-header">
                 <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
                 <p id="adminName" style="color: #fff; font-weight: 600; margin-top: 1rem;"></p>
-                <button class="hamburger-menu" id="hamburgerMenu">☰</button>
+                <button class="hamburger-menu" id="hamburgerMenu">&#9776;</button>
             </div>
             <nav class="sidebar-nav">
                 <ul>
@@ -76,7 +76,6 @@
                                 </tr>
                             </thead>
                             <tbody id="complaintsTableBody">
-                                <!-- Complaints will be loaded here by JavaScript -->
                                 <tr><td colspan="9" class="empty-state">Loading complaints...</td></tr>
                             </tbody>
                         </table>
@@ -90,7 +89,8 @@
     <div id="complaintManageModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
-                <h3 id="modalComplaintTitle">Manage Complaint</h3>
+                <!-- FIX: was id="modalComplaintTitle" — renamed to id="modalHeader" to remove duplicate ID -->
+                <h3 id="modalHeader">Manage Complaint</h3>
                 <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
             </div>
             <div class="modal-body">
@@ -99,6 +99,7 @@
                 <p><strong>Matric Number:</strong> <span id="modalStudentMatric"></span></p>
                 <p><strong>Room Number:</strong> <span id="modalStudentRoom"></span></p>
                 <hr style="margin: 1rem 0;">
+                <!-- FIX: this span now correctly holds the only id="modalComplaintTitle" -->
                 <p><strong>Title:</strong> <span id="modalComplaintTitle"></span></p>
                 <p><strong>Category:</strong> <span id="modalComplaintCategory"></span></p>
                 <p><strong>Priority:</strong> <span id="modalComplaintPriority"></span></p>
@@ -122,7 +123,13 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" id="updateComplaintButton">Update Complaint</button>
+                <button class="btn btn-primary" id="updateComplaintButton">
+                    <i class="fas fa-save"></i> Update Status
+                </button>
+                <!-- NEW: Send Reply button so admin can notify the student -->
+                <button class="btn btn-success" id="sendReplyButton">
+                    <i class="fas fa-paper-plane"></i> Send Reply to Student
+                </button>
                 <button class="btn btn-outline" id="modalCloseBtnFooter">Close</button>
             </div>
         </div>
@@ -132,7 +139,7 @@
     <script src="/js/admin.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            requireAuth('admin'); // Ensure admin is authenticated
+            // FIX: removed redundant requireAuth('admin') call — admin.js already handles this
 
             const sidebar = document.querySelector('.sidebar');
             const hamburgerMenu = document.getElementById('hamburgerMenu');
@@ -148,7 +155,6 @@
                 logout();
             });
 
-            // Re-attach close button listener for the footer button
             document.getElementById('modalCloseBtnFooter').addEventListener('click', () => {
                 document.getElementById('complaintManageModal').classList.remove('show');
             });

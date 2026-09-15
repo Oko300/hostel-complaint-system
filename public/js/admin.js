@@ -1,16 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const auth = requireAuth('admin'); // Ensure user is logged in and is an admin
-  if (!auth) return; // If not authenticated or not admin, requireAuth will redirect
+  const auth = requireAuth('admin');
+  if (!auth) return;
 
   const { token, user } = auth;
   const API_BASE_URL_ADMIN = '/api/admin';
   const API_BASE_URL_COMPLAINTS = '/api/complaints';
 
-  // Populate sidebar admin info
+  // Populate sidebar admin name
   const adminNameElement = document.getElementById('adminName');
   if (adminNameElement) adminNameElement.textContent = user.full_name;
 
-  // Handle logout button
+  // Handle logout
   const logoutButton = document.getElementById('logoutButton');
   if (logoutButton) {
     logoutButton.addEventListener('click', (e) => {
@@ -19,14 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Function to fetch admin stats
+  // ─── FETCH ADMIN STATS ───────────────────────────────────────────────────────
   const fetchAdminStats = async () => {
     try {
       const response = await fetch(`${API_BASE_URL_ADMIN}/stats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
+      // FIX: check response.ok before parsing JSON
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        console.error('Failed to fetch admin stats:', response.status, err.message || '');
+        return null;
+      }
       const data = await response.json();
       if (data.success) {
         return data.data;
@@ -40,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Function to fetch all complaints for admin
+  // ─── FETCH ALL COMPLAINTS ────────────────────────────────────────────────────
   const fetchAllComplaints = async (statusFilter = '', categoryFilter = '', searchTerm = '') => {
     try {
       let url = `${API_BASE_URL_ADMIN}/complaints`;
@@ -51,10 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (params.toString()) url += `?${params.toString()}`;
 
       const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
+      // FIX: check response.ok before parsing JSON
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        console.error('Failed to fetch all complaints:', response.status, err.message || '');
+        return [];
+      }
       const data = await response.json();
       if (data.success) {
         return data.data;
@@ -68,7 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Dashboard specific logic
+  // ════════════════════════════════════════════════════════════════════════════
+  // DASHBOARD PAGE
+  // ════════════════════════════════════════════════════════════════════════════
   if (window.location.pathname.includes('admin/dashboard.html')) {
     const updateDashboard = async () => {
       const stats = await fetchAdminStats();
@@ -83,8 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const recentComplaintsBody = document.getElementById('recentComplaintsBody');
         if (recentComplaintsBody) {
           recentComplaintsBody.innerHTML = '';
-          const complaints = await fetchAllComplaints(); // Fetch all to get recent
-          const recent = complaints.slice(0, 5); // Last 5 complaints
+          const complaints = await fetchAllComplaints();
+          const recent = complaints.slice(0, 5);
           if (recent.length === 0) {
             recentComplaintsBody.innerHTML = `<tr><td colspan="5" class="empty-state">No recent complaints.</td></tr>`;
           } else {
@@ -132,7 +142,9 @@ document.addEventListener('DOMContentLoaded', () => {
     updateDashboard();
   }
 
-  // All Complaints specific logic
+  // ════════════════════════════════════════════════════════════════════════════
+  // ALL COMPLAINTS PAGE
+  // ════════════════════════════════════════════════════════════════════════════
   if (window.location.pathname.includes('admin/complaints.html')) {
     const statusFilterSelect = document.getElementById('statusFilter');
     const categoryFilterSelect = document.getElementById('categoryFilter');
@@ -144,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalStudentName = document.getElementById('modalStudentName');
     const modalStudentMatric = document.getElementById('modalStudentMatric');
     const modalStudentRoom = document.getElementById('modalStudentRoom');
+    // FIX: now correctly targets the <span> in modal body since the <h3> duplicate was renamed
     const modalComplaintTitle = document.getElementById('modalComplaintTitle');
     const modalComplaintCategory = document.getElementById('modalComplaintCategory');
     const modalComplaintPriority = document.getElementById('modalComplaintPriority');
@@ -156,13 +169,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentComplaintId = null;
 
+    // ── Render complaints table ──────────────────────────────────────────────
     const renderComplaintsTable = (complaints) => {
       complaintsTableBody.innerHTML = '';
       if (complaints.length === 0) {
         complaintsTableBody.innerHTML = `<tr><td colspan="9" class="empty-state">No complaints found.</td></tr>`;
         return;
       }
-
       complaints.forEach(complaint => {
         const row = `
           <tr>
@@ -187,13 +200,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     };
 
+    // ── Open modal and load single complaint ─────────────────────────────────
     const openManageComplaintModal = async (id) => {
       try {
         const response = await fetch(`${API_BASE_URL_COMPLAINTS}/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+          headers: { 'Authorization': `Bearer ${token}` },
         });
+        // FIX: check response.ok before parsing JSON
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          alert(err.message || 'Failed to load complaint details.');
+          return;
+        }
         const data = await response.json();
 
         if (data.success) {
@@ -201,9 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
           currentComplaintId = complaint.id;
 
           modalComplaintId.textContent = complaint.id;
-          modalStudentName.textContent = complaint.user_full_name;
-          modalStudentMatric.textContent = complaint.user_matric_number;
-          modalStudentRoom.textContent = complaint.user_room_number;
+          modalStudentName.textContent = complaint.user_full_name || 'N/A';
+          modalStudentMatric.textContent = complaint.user_matric_number || 'N/A';
+          modalStudentRoom.textContent = complaint.user_room_number || 'N/A';
           modalComplaintTitle.textContent = complaint.title;
           modalComplaintCategory.textContent = complaint.category;
           modalComplaintPriority.innerHTML = `<span class="badge priority-${complaint.priority.toLowerCase()}">${complaint.priority}</span>`;
@@ -223,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
+    // ── Close modal ──────────────────────────────────────────────────────────
     modalCloseBtn.addEventListener('click', () => {
       complaintManageModal.classList.remove('show');
     });
@@ -233,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // ── Update status only (no reply notification) ───────────────────────────
     updateComplaintButton.addEventListener('click', async () => {
       if (!currentComplaintId) return;
 
@@ -248,13 +268,17 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           body: JSON.stringify({ status: newStatus, admin_response: newAdminResponse }),
         });
-
+        // FIX: check response.ok before parsing JSON
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          alert(err.message || 'Failed to update complaint.');
+          return;
+        }
         const data = await response.json();
-
         if (data.success) {
           alert('Complaint updated successfully!');
           complaintManageModal.classList.remove('show');
-          loadComplaints(); // Refresh table
+          loadComplaints();
         } else {
           alert(data.message || 'Failed to update complaint.');
         }
@@ -264,6 +288,56 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // ── NEW: Send Reply button — saves response + marks student notification ──
+    const sendReplyButton = document.getElementById('sendReplyButton');
+    if (sendReplyButton) {
+      sendReplyButton.addEventListener('click', async () => {
+        if (!currentComplaintId) return;
+
+        const adminResponse = modalAdminResponse.value.trim();
+        if (!adminResponse) {
+          alert('Please write a response message before sending.');
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL_ADMIN}/complaints/${currentComplaintId}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                status: modalStatusSelect.value,
+                admin_response: adminResponse,
+                is_read_by_student: 0  // marks as unread so student sees "New Response" badge
+              }),
+            }
+          );
+          // FIX: check response.ok before parsing JSON
+          if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            alert(err.message || 'Failed to send reply.');
+            return;
+          }
+          const data = await response.json();
+          if (data.success) {
+            alert('Reply sent to student successfully!');
+            complaintManageModal.classList.remove('show');
+            loadComplaints();
+          } else {
+            alert(data.message || 'Failed to send reply.');
+          }
+        } catch (error) {
+          console.error('Error sending reply:', error);
+          alert('An error occurred while sending the reply.');
+        }
+      });
+    }
+
+    // ── Load and filter complaints ───────────────────────────────────────────
     const loadComplaints = async () => {
       const selectedStatus = statusFilterSelect.value === 'All' ? '' : statusFilterSelect.value;
       const selectedCategory = categoryFilterSelect.value === 'All' ? '' : categoryFilterSelect.value;
@@ -274,11 +348,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     statusFilterSelect.addEventListener('change', loadComplaints);
     categoryFilterSelect.addEventListener('change', loadComplaints);
-    searchInput.addEventListener('input', loadComplaints); // Live search
+
+    // FIX: debounce search input — was firing an API call on every single keystroke
+    let debounceTimer;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(loadComplaints, 300);
+    });
+
     loadComplaints();
   }
 
-  // Reports specific logic
+  // ════════════════════════════════════════════════════════════════════════════
+  // REPORTS PAGE
+  // ════════════════════════════════════════════════════════════════════════════
   if (window.location.pathname.includes('admin/reports.html')) {
     const fromDateInput = document.getElementById('fromDate');
     const toDateInput = document.getElementById('toDate');
@@ -299,17 +382,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        let url = `${API_BASE_URL_ADMIN}/reports`;
         const params = new URLSearchParams();
         params.append('from', fromDate);
         params.append('to', toDate);
-        url += `?${params.toString()}`;
+        const url = `${API_BASE_URL_ADMIN}/reports?${params.toString()}`;
 
         const response = await fetch(url, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+          headers: { 'Authorization': `Bearer ${token}` },
         });
+        // FIX: check response.ok before parsing JSON
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          alert(err.message || 'Failed to generate report.');
+          return;
+        }
         const data = await response.json();
 
         if (data.success) {
@@ -357,30 +443,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     generateReportButton.addEventListener('click', generateReport);
 
+    // ── Export CSV with basic injection protection ───────────────────────────
     exportCsvButton.addEventListener('click', () => {
       if (currentReportData.length === 0) {
-        alert('No data to export.');
+        alert('No data to export. Generate a report first.');
         return;
       }
+
+      // FIX: sanitize values to prevent CSV formula injection in Excel
+      const sanitize = (val) => {
+        const s = String(val === null || val === undefined ? '' : val);
+        return /^[=+\-@]/.test(s) ? `'${s}` : s;
+      };
 
       const headers = [
         'ID', 'Student Name', 'Matric Number', 'Room Number', 'Title',
         'Category', 'Priority', 'Status', 'Submitted Date', 'Admin Response'
       ];
+
       const rows = currentReportData.map(c => [
-        c.id, c.user_full_name, c.user_matric_number, c.user_room_number, c.title,
-        c.category, c.priority, c.status, new Date(c.created_at).toLocaleDateString(),
-        c.admin_response || 'N/A'
+        sanitize(c.id),
+        sanitize(c.user_full_name),
+        sanitize(c.user_matric_number),
+        sanitize(c.user_room_number),
+        sanitize(c.title),
+        sanitize(c.category),
+        sanitize(c.priority),
+        sanitize(c.status),
+        sanitize(new Date(c.created_at).toLocaleDateString()),
+        sanitize(c.admin_response || 'N/A')
       ]);
 
-      let csvContent = "data:text/csv;charset=utf-8,"
-        + headers.join(',') + "\n"
-        + rows.map(e => e.join(',')).join("\n");
+      let csvContent = 'data:text/csv;charset=utf-8,'
+        + headers.join(',') + '\n'
+        + rows.map(e => e.join(',')).join('\n');
 
       const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "complaint_report.csv");
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', 'complaint_report.csv');
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
